@@ -60,7 +60,6 @@ The build process is configured in two main files:
 - `build/` - Compiled server-side code
 - `server/` - Hono server code
 - `server/static/` - Location for client-side bundles
-- `public/` - Static assets
 
 ## Notes
 
