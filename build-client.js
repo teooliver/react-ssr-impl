@@ -24,6 +24,7 @@ async function buildClientBundle() {
           output: {
             entryFileNames: 'main.js',
             format: 'esm',
+            manualChunks: () => 'main', // Force everything into one bundle
           },
           external: [], // Bundle everything
           preserveEntrySignatures: false,
@@ -37,6 +38,9 @@ async function buildClientBundle() {
       ],
       mode: 'production',
       logLevel: 'info',
+      resolve: {
+        dedupe: ['react', 'react-dom']
+      },
     });
     
     console.log('Client bundle built successfully!');

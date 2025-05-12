@@ -8,28 +8,7 @@ import path from 'path';
 export default defineConfig({
   plugins: [
     react(),
-    {
-      name: 'bundle-main-jsx',
-      apply: 'build',
-      async closeBundle() {
-        const { build } = await import('vite');
-        await build({
-          build: {
-            lib: {
-              entry: path.resolve('./src/main.jsx'),
-              formats: ['es'],
-              fileName: () => 'main.js',
-            },
-            minify: 'terser',
-            outDir: 'server/static',
-            emptyOutDir: false,
-            rollupOptions: {
-              external: [],
-            },
-          },
-        });
-      },
-    },
+    // Main JSX is now bundled by build-client.js
     {
       name: 'transform-app-and-children',
       apply: 'build',
