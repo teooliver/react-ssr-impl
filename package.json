@@ -10,7 +10,9 @@
     "build:all": "npm run build && npm run build:client",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start": "node server/index.js"
+    "start": "node server/index.js",
+    "serve-app": "node server/index.js",
+    "serve-props": "node props-server/index.js"
   },
   "dependencies": {
     "@hono/node-server": "^1.14.1",
