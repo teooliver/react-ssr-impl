@@ -10,7 +10,7 @@ app.use("/*", cors());
 
 // API endpoint for random 3-word text
 app.get("/api/pageTitle", (c) => {
-  const title = "Some HardCoded Title Example";
+  const title = "This is a page title example";
   return c.json({
     content: title,
     timestamp: new Date().toISOString(),
