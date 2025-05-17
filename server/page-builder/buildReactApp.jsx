@@ -1,5 +1,5 @@
 import React from "react";
-import { componentRegistry } from "./cms/components";
+import { componentRegistry } from "../../cms/registry";
 
 /**
  * Builds a React component tree from a layout configuration
@@ -213,18 +213,3 @@ export async function fetchComponentData(layout) {
 
   return result;
 }
-
-// Example usage:
-// import layout from './layout.json';
-//
-// // In a client-side app:
-// const app = await renderAppFromLayout(layout);
-// ReactDOM.render(app, document.getElementById('root'));
-//
-// // In a server-side rendering context:
-// const serverData = await fetchComponentData(layout);
-// const appHtml = ReactDOMServer.renderToString(await renderAppFromLayout(layout));
-//
-// // Hydrating on the client with server data:
-// const serverData = window.__SERVER_DATA__;
-// ReactDOM.hydrate(await renderAppFromLayout(layout), document.getElementById('root'));

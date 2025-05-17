@@ -20,7 +20,7 @@ async function buildLayoutClient() {
       build: {
         outDir: outputDir,
         rollupOptions: {
-          input: path.resolve(__dirname, "src/main.jsx"),
+          input: path.resolve(__dirname, "../src/App.jsx"),
           output: {
             entryFileNames: "layout.js",
             format: "esm",

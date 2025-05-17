@@ -15,7 +15,7 @@ export default defineConfig({
       async generateBundle() {
         // Process App.jsx and index.js
         const appPath = path.resolve("./src/App.jsx");
-        const indexPath = path.resolve("./src/index.js");
+        const indexPath = path.resolve("./src/App.jsx");
         const outputDir = path.resolve("./build");
 
         const transformFile = async (filePath) => {
@@ -92,7 +92,6 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: "./src/App.jsx",
-        index: "./src/index.js",
       },
       output: {
         format: "esm",

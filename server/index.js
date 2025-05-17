@@ -11,8 +11,8 @@ const app = new Hono();
 app.use("/static/*", serveStatic({ root: "./server" }));
 app.use("/assets/*", serveStatic({ root: "./dist" }));
 
-// Add layout-driven rendering route
-app.get("/somepage", async (c) => {
+// Add App component rendering route
+app.get("/", async (c) => {
   const { html, data } = await renderLayoutToHtml();
   const fullHtml = createHtmlDocument(html, data);
 
