@@ -1,11 +1,13 @@
 import React from "react";
 import { renderToString } from "react-dom/server";
+import path from "path";
+import { fileURLToPath } from "url";
 
-import { buildReactApp } from "./buildReactApp.jsx";
-import layout from "../../cms/layout.json";
+import { loadAppComponent } from "./buildReactApp.js";
 
-// API base URL for fetching server-side props
-const API_BASE_URL = "http://localhost:3333/api/";
+// Get the current file path
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /**
  * Renders the App component to HTML
@@ -19,8 +21,15 @@ export async function renderLayoutToHtml() {
       pageTitle: "Server-side rendered title",
     };
 
+    // Load the App component directly from the build folder
+    const App = loadAppComponent();
+    
+    if (!App) {
+      throw new Error("Failed to load App component");
+    }
+
     // Render the App component directly
-    const html = renderToString(buildReactApp(layout));
+    const html = renderToString(React.createElement(App));
 
     return { html, data: serverData };
   } catch (error) {

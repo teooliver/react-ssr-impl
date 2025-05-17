@@ -1,5 +1,5 @@
 import React from "react";
-import { componentRegistry } from "../../cms/registry";
+import { componentRegistry } from "../../cms/registry.js";
 
 /**
  * Builds a React component tree from a layout configuration
@@ -101,41 +101,61 @@ export async function loadComponentsFromLayout(layout) {
   // Map of component names to their implementations
   const loadedComponents = {};
 
-  // Load each component dynamically
+  // Direct import for App component to avoid dynamic loading
+  if (requiredComponentIds.has("550e8400-e29b-41d4-a716-446655440000")) {
+    try {
+      const { App } = require("../static/main.js");
+      loadedComponents["App"] = App;
+      console.info("Loaded App component directly");
+    } catch (error) {
+      console.error(`Failed to load App component: ${error.message}`);
+    }
+  }
+  
+  // Load remaining components from the build folder
   for (const id of requiredComponentIds) {
     const componentConfig = componentRegistry[id];
-    if (!componentConfig) {
-      console.warn(
-        `Component with ID "${id}" not found in components registry`,
-      );
+    // Skip App component as it's already loaded
+    if (!componentConfig || componentConfig.name === "App") {
       continue;
     }
 
     const { name } = componentConfig;
     try {
-      // In a production environment, use dynamic imports
+      // Import component from the build folder
+      const path = `../static/${name}.js`;
+      
       if (typeof window !== "undefined") {
         // Client-side - dynamic import
-        const module = await import(`./src/${name}.jsx`);
+        const module = await import(path);
         loadedComponents[name] = module.default || module[name];
       } else {
-        // Server-side - require (for Node.js SSR)
-        try {
-          // Use require for server-side rendering
-          const module = require(`./src/${name}.jsx`);
-          loadedComponents[name] = module.default || module[name];
-        } catch (_) {
-          // If .jsx extension fails, try .js (for compiled files)
-          const module = require(`./build/${name}.js`);
-          loadedComponents[name] = module.default || module[name];
-        }
+        // Server-side - CommonJS require
+        const module = require(path);
+        loadedComponents[name] = module.default || module[name];
       }
+      
+      console.info(`Loaded component: ${name}`);
     } catch (error) {
-      console.error(`Failed to load component ${name}:`, error);
+      console.error(`Failed to load component ${name}: ${error.message}`);
     }
   }
 
   return loadedComponents;
+}
+
+/**
+ * Loads the App component directly without using the layout
+ * @returns {React.ReactElement|null} The App component or null if loading fails
+ */
+export function loadAppComponent() {
+  try {
+    const { App } = require("../static/main.js");
+    return App;
+  } catch (error) {
+    console.error(`Failed to load App component directly: ${error.message}`);
+    return null;
+  }
 }
 
 /**
@@ -144,72 +164,24 @@ export async function loadComponentsFromLayout(layout) {
  * @returns {Promise<React.ReactElement>} The rendered React component
  */
 export async function renderAppFromLayout(layout) {
+  if (!layout) {
+    console.error("Layout configuration is missing");
+    return null;
+  }
+  
   try {
     // Load all components needed for the layout
     const loadedComponents = await loadComponentsFromLayout(layout);
-
+    
+    if (Object.keys(loadedComponents).length === 0) {
+      console.error("No components were loaded successfully");
+      return null;
+    }
+    
     // Build the component tree
     return buildReactApp(layout, loadedComponents);
   } catch (error) {
-    console.error("Error rendering app from layout:", error);
+    console.error(`Error rendering app from layout: ${error.message}`);
     return null;
   }
-}
-
-/**
- * Fetches data for components that require server-side props
- * @param {Object} layout - The layout configuration
- * @returns {Object} Map of component IDs to their fetched data
- */
-export async function fetchComponentData(layout) {
-  const componentsWithServerProps = new Map();
-  const fetchPromises = [];
-
-  // Helper function to find components with server-side props
-  function findComponentsWithServerProps(layoutNode) {
-    if (!layoutNode || !layoutNode.component) return;
-
-    const componentId = layoutNode.component;
-    const componentConfig = componentRegistry[componentId];
-
-    if (componentConfig?.serverSideProps?.length > 0) {
-      // Store the component and create fetch promises for each data endpoint
-      componentsWithServerProps.set(componentId, {
-        layout: layoutNode,
-        data: {},
-      });
-
-      for (const endpoint of componentConfig.serverSideProps) {
-        const promise = fetch(endpoint)
-          .then((response) => response.json())
-          .then((data) => {
-            const componentData = componentsWithServerProps.get(componentId);
-            componentData.data[endpoint] = data;
-          })
-          .catch((error) => {
-            console.error(`Error fetching data from ${endpoint}:`, error);
-          });
-
-        fetchPromises.push(promise);
-      }
-    }
-
-    // Process children recursively
-    if (layoutNode.children && Array.isArray(layoutNode.children)) {
-      layoutNode.children.forEach(findComponentsWithServerProps);
-    }
-  }
-
-  findComponentsWithServerProps(layout);
-
-  // Wait for all data fetches to complete
-  await Promise.all(fetchPromises);
-
-  // Transform the map to a simple object for easier consumption
-  const result = {};
-  for (const [id, { data }] of componentsWithServerProps.entries()) {
-    result[id] = data;
-  }
-
-  return result;
 }

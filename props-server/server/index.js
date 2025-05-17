@@ -24,12 +24,10 @@ app.get("/", (c) => {
   );
 });
 
-// Start the server
-const port = process.env.PORT || 3333;
 serve(
   {
     fetch: app.fetch,
-    port,
+    port: 3333,
   },
   (info) => {
     console.log(

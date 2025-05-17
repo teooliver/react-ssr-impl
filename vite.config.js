@@ -8,7 +8,7 @@ import path from "path";
 export default defineConfig({
   plugins: [
     react(),
-    // Main JSX is now bundled by build-client.js
+    // Copy built files to server/static as well
     {
       name: "transform-app-and-children",
       apply: "build",
@@ -51,8 +51,15 @@ export default defineConfig({
             .join(outputDir, relativePath)
             .replace(/\.jsx$/, ".js");
 
+          // Write to build directory
           fs.mkdirSync(path.dirname(outputPath), { recursive: true });
           fs.writeFileSync(outputPath, transformedCode);
+          
+          // Also write to server/static directory
+          const serverStaticDir = path.resolve("./server/static");
+          const serverOutputPath = path.join(serverStaticDir, path.basename(outputPath));
+          fs.mkdirSync(serverStaticDir, { recursive: true });
+          fs.writeFileSync(serverOutputPath, transformedCode);
         };
 
         const processDependencies = (filePath, visited = new Set()) => {
@@ -92,6 +99,9 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: "./src/App.jsx",
+        Header: "./src/Header.jsx",
+        Card: "./src/Card.jsx",
+        Count: "./src/Count.jsx"
       },
       output: {
         format: "esm",
