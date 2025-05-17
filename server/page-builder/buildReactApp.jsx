@@ -33,7 +33,7 @@ export function buildReactApp(layout, loadedComponents) {
   }
 
   // Prepare props from the layout
-  const props = { ...layout.props } || {};
+  const props = { ...(layout.props || {}) };
 
   // If the component needs server-side props, we'd handle that here
   // For server-rendered content, the data would be passed in from the server
@@ -124,7 +124,7 @@ export async function loadComponentsFromLayout(layout) {
           // Use require for server-side rendering
           const module = require(`./src/${name}.jsx`);
           loadedComponents[name] = module.default || module[name];
-        } catch (requireError) {
+        } catch (_) {
           // If .jsx extension fails, try .js (for compiled files)
           const module = require(`./build/${name}.js`);
           loadedComponents[name] = module.default || module[name];
