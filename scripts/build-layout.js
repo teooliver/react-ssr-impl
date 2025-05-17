@@ -1,0 +1,50 @@
+import { build } from "vite";
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+async function buildLayoutClient() {
+  console.log("Building layout client bundle...");
+
+  // Ensure the output directory exists
+  const outputDir = path.resolve(__dirname, "server/static");
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
+  }
+
+  try {
+    await build({
+      configFile: false,
+      build: {
+        outDir: outputDir,
+        rollupOptions: {
+          input: path.resolve(__dirname, "src/main.jsx"),
+          output: {
+            entryFileNames: "layout.js",
+            format: "esm",
+            manualChunks: () => "layout", // Force all code into a single bundle
+          },
+          external: [], // Bundle everything
+          preserveEntrySignatures: false,
+        },
+        minify: true,
+        write: true,
+        emptyOutDir: false,
+      },
+      plugins: [await (await import("@vitejs/plugin-react")).default()],
+      mode: "production",
+      logLevel: "info",
+      resolve: {
+        dedupe: ["react", "react-dom"],
+      },
+    });
+
+    console.log("Layout client bundle built successfully!");
+  } catch (error) {
+    console.error("Error building layout client bundle:", error);
+  }
+}
+
+buildLayoutClient();

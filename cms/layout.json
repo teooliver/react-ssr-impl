@@ -25,12 +25,6 @@
       "props": {
         "btnID": "some-button-id"
       }
-    },
-    {
-      "component": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
-      "props": {
-        "btnID": "some-button-id"
-      }
     }
   ]
 }

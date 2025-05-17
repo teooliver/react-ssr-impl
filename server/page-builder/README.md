@@ -1,0 +1,1 @@
+This will get the `layout.json`and `components.js` in the cms folder, then it will build the page based in the layout, and for any component that has `serverSideProps` we will go and fetch the data from the props-server and inject it in as regular props. In the end we will have a React App built from scratch, and ready to be served

@@ -6,8 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:client": "node build-client.js",
-    "build:all": "npm run build && npm run build:client",
+    "build:client": "node scripts/build-client.js",
+    "build:layout": "node scripts/build-layout.js",
+    "build:all": "npm run build && npm run build:client && npm run build:layout",
     "lint": "eslint .",
     "preview": "vite preview",
     "start": "node server/index.js",
